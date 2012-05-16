@@ -21,13 +21,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Set this to your icon. Leave it as comment for no icon.
-iconfile=~/.scripts/mail-icon.png
-# Set this to "/dev/null" to avoid logging 
+## Set this to your icon FULL path. Leave it as comment for no icon.
+#iconfile=/path/to/mail-icon.png
+## Set this to "/dev/null" to avoid logging 
 logfile=/tmp/alpine-notify.log
-# Check if this matches your alpine settings
+## Check if this matches your alpine settings
 fifofile=/tmp/alpine.fifo
-# Check if this matches your alpine command
+## Check if this matches your alpine command
 alpine=alpine
 
 ## If you have a password file and you have xclip installed,
