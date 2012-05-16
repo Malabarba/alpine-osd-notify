@@ -80,7 +80,7 @@ pidn=$!
 echo "My pid is $$"
 echo "Subprocess pid is $pidn"
 
-$alpine
+$alpine "$@"
 
 # kill -9 $pidn
 
