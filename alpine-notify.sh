@@ -21,23 +21,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-## Set this to your icon FULL path. Leave it as comment for no icon.
-#iconfile=/path/to/mail-icon.png
+## Set this to your icon FULL path. Leave it as empty for no icon.
+iconfile=
 ## Set this to "/dev/null" to avoid logging 
 logfile=/tmp/alpine-notify.log
 ## Check if this matches your alpine settings
 fifofile=/tmp/alpine.fifo
 ## Check if this matches your alpine command
 alpine=alpine
-
-## If you have a password file and you have xclip installed,
-## uncommenting this copies the password to the clipboard right before
-## starting alpine. This way you can just hit Shift+Insert at the
-## password prompt and it gets inserted for you.
-#cat "path/to/password-file" | xclip -i -selection primary
+## If you have a file with your password in it and you have xclip
+## installed, this script can copy it to your clipboard for you.  Set
+## this variable to the file path and the password will be copied
+## to the clipboard right before starting alpine. This way you can
+## just hit Shift+Insert at the password prompt and it gets inserted
+## for you. Otherwise, leave it empty.
+pfile=
 
 # You shouldn't have to edit anything that follows. If you were forced
 # to edit something here to get the behavior you wanted, contact me.
+
+[[ -n $pfile ]] && cat $pfile | xclip -i -selection primary
 
 echo "Starting $0." > $logfile
 notify-send -t 1000 "Starting $0." ""
@@ -56,9 +59,9 @@ function _alpine_notify(){
 
 	   # Ignore some junk lines at the start of the fifo file
 	   if [[ `wc -l $logfile | awk '{print $1}'` -gt $ignorelines ]]; then
-		  name=`echo "$L"  | sed 's/  \+/\t/g;s/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)\t.*/\2/'`
-		  subject=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)\t.*/\3/'`
-		  box=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\([^\t]*\)\t\([^\t]*\).*/\3/'`
+		  name=`echo "$L"  | sed 's/  \+/\t/g;s/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)[\t ].*/\2/'`
+		  subject=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)[\t ].*/\3/'`
+		  box=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\([^\t]*\)[\t ]\([^\t]*\).*/\3/'`
 
 		  notify-send -t 10000 $iconcommand "Mail from $name" "$subject\n-\nIn your $box."
 
