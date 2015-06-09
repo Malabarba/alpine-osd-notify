@@ -8,7 +8,7 @@ made available by the libnotify package, but that may vary between
 distros.
 
 INSTALLATION
-============
+------------
 
 To install this:
  - Simply place this script anywhere you want (preferably in your $PATH).
