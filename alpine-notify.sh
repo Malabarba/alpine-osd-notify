@@ -50,7 +50,7 @@ iconcommand=""
 
 function _alpine_notify(){
     ignorelines=4
-    
+
     [[ -n "$1" ]] &&  sleep "$1"
     notify-send -t 1000 "alpine" "Starting subprocess."
 
@@ -59,9 +59,29 @@ function _alpine_notify(){
 
         # Ignore some junk lines at the start of the fifo file
         if [[ `wc -l $logfile | awk '{print $1}'` -gt $ignorelines ]]; then
-            name=`echo "$L"  | sed 's/  \+/\t/g;s/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)[\t ].*/\2/'`
-            subject=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)[\t ].*/\3/'`
-            box=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\([^\t]*\)[\t ]\([^\t]*\).*/\3/'`
+            line=`echo "$L"`
+
+            # Lines in the fifo will have from-name/subject/mailbox
+            # Normally these fields are separated by multiple spaces,
+            # which this code converts to tabs
+            # But in some cases there is only one space
+            # These first few lines handle a couple of these cases,
+            # adding an extra space so that there are at least two
+
+            # Handle when the from-name is an email address that takes up
+            # the entire width of that field, allowing only one space
+            line=`echo "$line" | sed 's/^\(+ \)\?\([A-Za-z0-9\.\_\-]\+@[A-Za-z0-9\.\_\-]\+ \)/\2 /'`
+            # Handle when the from-name and/or subject was too long and
+            # was truncated by alpine, to end in "... "
+            line=`echo "$line" | sed 's/\.\.\. /...  /g'`
+
+            # Convert the multiple spaces to tabs
+            line=`echo "$line" | sed 's/  \+/\t/g'`
+
+            # Get the from-name, subject, and inbox
+            name=`echo "$line" | sed 's/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)[\t ].*/\2/'`
+            subject=`echo "$line" | sed 's/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)[\t ].*/\3/'`
+            box=`echo "$line" | sed 's/^\([^\t]*\)\t\([^\t]*\)[\t ]\([^\t]*\).*/\3/'`
 
             notify-send -t 10000 $iconcommand "Mail from $name" "$subject\n-\nIn your $box."
 
