@@ -23,7 +23,7 @@
 
 ## Set this to your icon FULL path. Leave it as empty for no icon.
 iconfile=
-## Set this to "/dev/null" to avoid logging 
+## Set this to "/dev/null" to avoid logging
 logfile=/tmp/alpine-notify.log
 ## Check if this matches your alpine settings
 fifofile=/tmp/alpine.fifo
@@ -55,21 +55,21 @@ function _alpine_notify(){
     notify-send -t 1000 "alpine" "Starting subprocess."
 
     while read L; do
-	   echo "$L" >> $logfile 
+        echo "$L" >> $logfile
 
-	   # Ignore some junk lines at the start of the fifo file
-	   if [[ `wc -l $logfile | awk '{print $1}'` -gt $ignorelines ]]; then
-		  name=`echo "$L"  | sed 's/  \+/\t/g;s/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)[\t ].*/\2/'`
-		  subject=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)[\t ].*/\3/'`
-		  box=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\([^\t]*\)[\t ]\([^\t]*\).*/\3/'`
+        # Ignore some junk lines at the start of the fifo file
+        if [[ `wc -l $logfile | awk '{print $1}'` -gt $ignorelines ]]; then
+            name=`echo "$L"  | sed 's/  \+/\t/g;s/^\(+ \)\?\([^\t]*\)\t\([^\t]*\)[\t ].*/\2/'`
+            subject=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\(Re: \?\)\?\([^\t]*\)[\t ].*/\3/'`
+            box=`echo "$L"  | sed 's/  \+/\t/g;s/^\([^\t]*\)\t\([^\t]*\)[\t ]\([^\t]*\).*/\3/'`
 
-		  notify-send -t 10000 $iconcommand "Mail from $name" "$subject\n-\nIn your $box."
+            notify-send -t 10000 $iconcommand "Mail from $name" "$subject\n-\nIn your $box."
 
-		  echo "$name" >> $logfile
-		  echo "$subject" >> $logfile
-		  echo "$box" >> $logfile
-	   fi
-	   
+            echo "$name" >> $logfile
+            echo "$subject" >> $logfile
+            echo "$box" >> $logfile
+        fi
+
     done < <(cat $fifofile)
 }
 
